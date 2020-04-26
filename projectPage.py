@@ -39,6 +39,8 @@ def submitTicket(proj_ID):
     #Only keep YYYY-MM-DD
     curr_date = str(curr_date)[:10]
 
+    print(clicked1, clicked2)
+
     #insert into table
     ticket_data = (enterTicketName.get(), enterTicketDescription.get(), str(clicked1), str(clicked2), ticketStatus, curr_date, proj_ID)
     c.execute("""INSERT INTO Tickets(title, description, ticket_type, priority, status, date_created, project_ID) VALUES
@@ -46,9 +48,11 @@ def submitTicket(proj_ID):
 
     ticketCounter = ticketCounter + 1
 
+    #close create ticket window
+    editor.destroy()
+
     #commit changes to conn
     conn.commit()
-
     #close conn
     conn.close()
 
@@ -186,7 +190,7 @@ def View_Project(proj_ID):
     if (ticket_count == 0):
         #Display "No Tickets Found" instead of table
         no_ticket_label = Label(project_window, text="No Tickets Found")
-        no_ticket_label.grid(row=5, column=0, columnspan=2)
+        no_ticket_label.grid(row=6, column=0, columnspan=2)
     else:
         Display_Tickets(project_window, proj_ID)
 
