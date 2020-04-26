@@ -3,26 +3,23 @@ import sqlite3
 
 #Import tkinter GUI modules
 try:
-    from Tkinter import *
-    from ttk import *
+	from Tkinter import *
+	from ttk import *
 except ImportError:  # Python 3
-    from tkinter import *
-    from tkinter.ttk import *
+	from tkinter import *
+	from tkinter.ttk import *
 
 #Import time functions
 from datetime import datetime
 
 ###FUNCTIONS###
-def projMan():
-    return
-
 def tickMan():
-    return
+	return
 
 '''def character_limit(entry_text):
-    value = dayValue.get()
-    if len(value) > 2:
-        dayValue.set(value[:2])'''
+	value = dayValue.get()
+	if len(value) > 2:
+		dayValue.set(value[:2])'''
 
 #entry_text = StringVar()
 #dayValue.trace('w', limitSizeDay)
@@ -46,7 +43,7 @@ def submitTicket(proj_ID):
     ticket_data = (enterTicketName.get(), enterTicketDescription.get(), str(clicked1), str(clicked2), ticketStatus, curr_date, proj_ID)
     c.execute("""INSERT INTO Tickets(title, description, ticket_type, priority, status, date_created, project_ID) VALUES
                 (?, ?, ?, ?, ?, ?, ?)""", ticket_data)
-        
+
     ticketCounter = ticketCounter + 1
 
     #commit changes to conn
@@ -131,6 +128,27 @@ def Count_Tickets(proj_ID):
 
 #Open project window and display all tickets associated with that project as well as its functions
 def View_Project(proj_ID):
+    global projID
+    projID = proj_ID
+
+    #conenct to conn
+    conn = sqlite3.connect('info.db')
+    #create cursor
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM Projects")
+    records = c.fetchall()
+    cont = 0
+    for x in records:
+        if int(x[0]) == int(projID):
+            print("project does exist")
+            cont = 1
+            break
+
+    if(cont == 0):
+        print("project does not exist")
+        return 
+
     #Open project window
     project_window = Toplevel()
     project_window.geometry("500x500")
