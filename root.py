@@ -1,14 +1,19 @@
 #Import sqlite3 database tools
 import sqlite3
 
-#Import tkinter GUI module (may be Tkinter on some systems)
+#Import tkinter GUI modules
 try:
-    from tkinter import *
-except(ImportError):
     from Tkinter import *
+    from ttk import *
+except ImportError:  # Python 3
+    from tkinter import *
+    from tkinter.ttk import *
 
 #Import time functions
 from datetime import datetime
+
+#Import project page code
+import projectPage
 
 #Flag indicates whether or not to populate the database tables with example data on creation
 populate_tables = "False"
@@ -99,7 +104,7 @@ def Generate_Button(proj_ID):
 	print(proj_info)
 
 	#Create frame for the project info
-	proj_frame = Frame(root, width=300, height=100, bd=5, highlightcolor="black", highlightthickness=5)
+	proj_frame = Frame(root, width=300, height=100)
 	#Disable resizing of frame
 	proj_frame.grid_propagate(False)
 	#Enable button to fill frame
@@ -109,7 +114,7 @@ def Generate_Button(proj_ID):
 
 	#Create and place button
 	btn_text = str(proj_info[0]) + "\t\t" + str(proj_info[1])
-	proj_btn = Button(proj_frame, text=btn_text, command=lambda: View_Project(proj_ID))
+	proj_btn = Button(proj_frame, text=btn_text, command=lambda: projectPage.View_Project(proj_ID))
 	proj_btn.grid(row=0, column=0)
 
 	#Place description beneath button
@@ -130,7 +135,7 @@ def Create_Project():
 	proj_window.title("Create New Project")
 
 	#Place title label
-	title_frame = Frame(proj_window, height=10, width=200, bd=5)
+	title_frame = Frame(proj_window, height=10, width=200)
 	title_frame.grid(row=0, column=0, pady=5)
 	title_label = Label(title_frame, text="CREATE NEW PROJECT")
 	title_label.pack()
@@ -193,7 +198,7 @@ def Manage_Projects():
 	proj_manage_window.title("Manage Projects")
 
 	#Place title label
-	title_frame = Frame(proj_manage_window, height=10, width=200, bd=5)
+	title_frame = Frame(proj_manage_window, height=10, width=200)
 	title_frame.grid(row=0, column=0, pady=5)
 	title_label = Label(title_frame, text="MANAGE PROJECTS")
 	title_label.pack()
@@ -301,12 +306,6 @@ def Delete_Project(proj_ID, proj_manage_window):
 
 	return
 
-
-#View a project
-def View_Project(proj_ID):
-	print("viewing project #", proj_ID)
-	return
-
 ###CREATE HOMEPAGE###
 #Create root window
 root = Tk()
@@ -314,7 +313,7 @@ root.title("Bug Tracker")
 root.geometry("500x500")
 
 #Place title frame
-title_frame = Frame(root, height=10, width=500, bd=5)
+title_frame = Frame(root, height=10, width=500)
 title_frame.grid(row=0, column=0, columnspan=2, pady=5)
 title_label = Label(title_frame, text="WELCOME TO THE BUG TRACKER!")
 title_label.grid(row=0, column=0, columnspan=2, sticky=N+S+E+W)
@@ -349,14 +348,34 @@ else:
 	ID_list = c.fetchall()
 	print(ID_list)
 
-	#Display projects (currently a button each)
-    #I would like the projects to be output as a table but have yet to do that - use a Treeview widget
-    #tree = Treeview(master, columns=('Position', 'Name', 'Score'), show='headings')
-    #tree.heading(<column>, text="Label")
-    #tree.insert("", "end", values=(<position>, <name>, <score>))
-    #https://stackoverflow.com/questions/50625306/what-is-the-best-way-to-show-data-in-a-table-in-tkinter/50651988#50651988
+	#Display projects within a table
+	table = Treeview(root)
+	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
+	table['show'] = 'headings'
+	table.heading('ID_num', text='ID #')
+	table.column('ID_num', anchor='center', width=25)
+	table.heading('name', text='Name')
+	table.column('name', anchor='center', width=100)
+	table.heading('desc', text='Description')
+	table.column('desc', anchor='center', width=250)
+	table.heading('tickets', text='Ticket Count')
+	table.column('tickets', anchor='center', width=25)
+	table.heading('date_created', text='Created On')
+	table.column('date_created', anchor='center', width=100)
+	table.grid(columnspan=2, sticky = (N,S,W,E))
+
 	for x in ID_list:
-		Generate_Button(x[0])
+		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
+		info = c.fetchone()
+		print(info)
+		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))
+
+	#Create field to view a certain project
+	proj_select_box = Entry(root, width=30)
+	proj_select_box.grid(row=5, column=0)
+	proj_select_btn = Button(root, text="VIEW PROJECT", command=lambda: projectPage.View_Project(proj_select_box.get()))
+	proj_select_btn.grid(row=5, column=1)
+
 
 	#Close connection
 	conn.close()
