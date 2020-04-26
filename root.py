@@ -3,11 +3,11 @@ import sqlite3
 
 #Import tkinter GUI modules
 try:
-    from Tkinter import *
-    from ttk import *
+	from Tkinter import *
+	from ttk import *
 except ImportError:  # Python 3
-    from tkinter import *
-    from tkinter.ttk import *
+	from tkinter import *
+	from tkinter.ttk import *
 
 #Import time functions
 from datetime import datetime
@@ -27,36 +27,36 @@ c = conn.cursor()
 #All tables are created only on the first run of the app
 #Create Ticket table
 try:
-    c.execute("""
-        CREATE TABLE Tickets (
-        ticket_ID Integer PRIMARY KEY,
-        title Text,
-        description Text,
-        ticket_type Text,
-        priority Text,
-        status Text,
-        date_created Text,
-        project_ID Integer,
-        FOREIGN KEY (project_ID) REFERENCES Projects(project_ID)
-        	ON DELETE CASCADE
-        )
-    	""")
+		c.execute("""
+		CREATE TABLE Tickets (
+		ticket_ID Integer PRIMARY KEY,
+		title Text,
+		description Text,
+		ticket_type Text,
+		priority Text,
+		status Text,
+		date_created Text,
+		project_ID Integer,
+		FOREIGN KEY (project_ID) REFERENCES Projects(project_ID)
+			ON DELETE CASCADE
+		)
+		""")
 except(sqlite3.OperationalError):
-    print("Table \'Tickets\' already exists")
+	print("Table \'Tickets\' already exists")
 
 #Create Projects table
 try:
-    c.execute("""
-        CREATE TABLE Projects (
-        project_ID Integer PRIMARY KEY,
-        name Text,
-        description Text,
-        ticket_count Integer,
-        date_created Text
-        )
-    	""")
+	c.execute("""
+		CREATE TABLE Projects (
+		project_ID Integer PRIMARY KEY,
+		name Text,
+		description Text,
+		ticket_count Integer,
+		date_created Text
+		)
+		""")
 except(sqlite3.OperationalError):
-    print("Table \'Projects\' already exists")
+	print("Table \'Projects\' already exists")
 
 #Commit changes
 conn.commit()
@@ -69,8 +69,8 @@ conn.close()
 
 #Populate function uses the given example data to be inserted into the database after initialization
 def populate():
-    print("Populate Function Called")
-    return
+	print("Populate Function Called")
+	return
 
 ###HELPER FUNCTIONS###
 #Count the total number of projects present in the database
@@ -121,45 +121,6 @@ def Generate_Button(proj_ID):
 	#Place description beneath button
 	desc_label = Label(proj_frame, text="-- " + proj_info[2])
 	desc_label.grid(row=1, column=0, sticky=N+W)
-
-	#Close connection
-	conn.close()
-
-	return
-
-#Display each project in a table format
-def	Display_Projects(root):
-	#Connect to database info file
-	conn = sqlite3.connect("info.db")
-	#Create database cursor
-	c = conn.cursor()
-
-	#Get a list of all current project IDs
-	c.execute("SELECT project_ID FROM Projects")
-	ID_list = c.fetchall()
-	print(ID_list)
-
-	#Display projects within a table
-	table = Treeview(root)
-	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
-	table['show'] = 'headings'
-	table.heading('ID_num', text='ID #')
-	table.column('ID_num', anchor='center', width=25)
-	table.heading('name', text='Name')
-	table.column('name', anchor='center', width=100)
-	table.heading('desc', text='Description')
-	table.column('desc', anchor='center', width=250)
-	table.heading('tickets', text='Ticket Count')
-	table.column('tickets', anchor='center', width=25)
-	table.heading('date_created', text='Created On')
-	table.column('date_created', anchor='center', width=100)
-	table.grid(row=3, column=0, columnspan=2, sticky = (N,S,W,E))
-
-	for x in ID_list:
-		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
-		info = c.fetchone()
-		print(info)
-		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))
 
 	#Close connection
 	conn.close()
@@ -219,6 +180,33 @@ def Submit_Project(name_box, description_box, proj_window):
 	#Clear text boxes
 	name_box.delete(0, END)
 	description_box.delete(0, END)
+
+	c.execute("SELECT project_ID FROM Projects")
+	ID_list = c.fetchall()
+	print(ID_list)
+
+	#Display projects within a table
+
+	table = Treeview(root)
+	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
+	table['show'] = 'headings'
+	table.heading('ID_num', text='ID #')
+	table.column('ID_num', anchor='center', width=25)
+	table.heading('name', text='Name')
+	table.column('name', anchor='center', width=100)
+	table.heading('desc', text='Description')
+	table.column('desc', anchor='center', width=250)
+	table.heading('tickets', text='Ticket Count')
+	table.column('tickets', anchor='center', width=25)
+	table.heading('date_created', text='Created On')
+	table.column('date_created', anchor='center', width=100)
+	table.grid(row=4, columnspan=2, sticky = (N,S,W,E))
+
+	for x in ID_list:
+		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
+		info = c.fetchone()
+		#print(info)
+		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))
 
 	#Close proj_window
 	proj_window.destroy()
@@ -308,6 +296,27 @@ def Save_Changes(proj_ID, name_box, description_box, proj_manage_window):
 	c.execute("UPDATE Projects SET name=?, description=? WHERE project_ID=?", (name_box.get(), description_box.get(), proj_ID))
 	print("Changes saved")
 
+	table = Treeview(root)
+	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
+	table['show'] = 'headings'
+	table.heading('ID_num', text='ID #')
+	table.column('ID_num', anchor='center', width=25)
+	table.heading('name', text='Name')
+	table.column('name', anchor='center', width=100)
+	table.heading('desc', text='Description')
+	table.column('desc', anchor='center', width=250)
+	table.heading('tickets', text='Ticket Count')
+	table.column('tickets', anchor='center', width=25)
+	table.heading('date_created', text='Created On')
+	table.column('date_created', anchor='center', width=100)
+	table.grid(row=4, columnspan=2, sticky = (N,S,W,E))
+
+	for x in ID_list:
+		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
+		info = c.fetchone()
+		#print(info)
+		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))
+
 	#Commit changes
 	conn.commit()
 	#Close connection
@@ -335,6 +344,27 @@ def Delete_Project(proj_ID, proj_manage_window):
 	#Update the project record with matching proj_ID
 	c.execute("DELETE FROM Projects WHERE project_ID=?", (proj_ID))
 	print("Project deleted")
+
+	'''table = Treeview(root)
+	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
+	table['show'] = 'headings'
+	table.heading('ID_num', text='ID #')
+	table.column('ID_num', anchor='center', width=25)
+	table.heading('name', text='Name')
+	table.column('name', anchor='center', width=100)
+	table.heading('desc', text='Description')
+	table.column('desc', anchor='center', width=250)
+	table.heading('tickets', text='Ticket Count')
+	table.column('tickets', anchor='center', width=25)
+	table.heading('date_created', text='Created On')
+	table.column('date_created', anchor='center', width=100)
+	table.grid(row=4, columnspan=2, sticky = (N,S,W,E))
+
+	for x in ID_list:
+		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
+		info = c.fetchone()
+		#print(info)
+		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))'''
 
 	#Commit changes
 	conn.commit()
@@ -378,13 +408,47 @@ if (proj_count == 0):
 	no_proj_label = Label(root, text="No Projects Found")
 	no_proj_label.grid(row=3, column=0, columnspan=2)
 else:
-	Display_Projects(root)
+	#Connect to database info file
+	conn = sqlite3.connect("info.db")
+	#Create database cursor
+	c = conn.cursor()
+
+	#Get a list of all current project IDs
+	c.execute("SELECT project_ID FROM Projects")
+	ID_list = c.fetchall()
+	print(ID_list)
+
+	#Display projects within a table
+	table = Treeview(root)
+	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
+	table['show'] = 'headings'
+	table.heading('ID_num', text='ID #')
+	table.column('ID_num', anchor='center', width=25)
+	table.heading('name', text='Name')
+	table.column('name', anchor='center', width=100)
+	table.heading('desc', text='Description')
+	table.column('desc', anchor='center', width=250)
+	table.heading('tickets', text='Ticket Count')
+	table.column('tickets', anchor='center', width=25)
+	table.heading('date_created', text='Created On')
+	table.column('date_created', anchor='center', width=100)
+	table.grid(row=4, columnspan=2, sticky = (N,S,W,E))
+
+	for x in ID_list:
+		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
+		info = c.fetchone()
+		#print(info)
+		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))
 
 	#Create field to view a certain project
 	proj_select_box = Entry(root, width=30)
 	proj_select_box.grid(row=5, column=0)
 	proj_select_btn = Button(root, text="VIEW PROJECT", command=lambda: projectPage.View_Project(proj_select_box.get()))
 	proj_select_btn.grid(row=5, column=1)
+
+
+	#Close connection
+	conn.close()
 
 
 #Enter event loop
