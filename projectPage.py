@@ -20,7 +20,7 @@ def tickMan(ticket_ID):
     c = conn.cursor()
 
     #Ensure ticket exists
-    c.execute("SELECT Count(*) FROM Tickets WHERE ticket_ID=?", ticket_ID)
+    c.execute("SELECT Count(*) FROM Tickets WHERE ticket_ID=? AND project_ID=?", (ticket_ID, projID))
     count = str(c.fetchone()[0])
     if (count == "0"):
         print("Ticket does not exist")
@@ -44,7 +44,6 @@ def tickMan(ticket_ID):
     title_box = Entry(ticket_manage_window, width=30)
     title_box.grid(row=1, column=0, columnspan=2, padx=5)
     title_box.insert(END, data[1])
-
 
     #Place entry box and label for "description" attribute
     description_label = Label(ticket_manage_window, text="Description")
@@ -118,7 +117,7 @@ def Save_Changes(ticket_ID, ticket_manage_window):
 
     for info in records:
         print(info)
-        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[6]))
+        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[5]))
 
     #Commit changes
     conn.commit()
@@ -148,6 +147,12 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
     c.execute("DELETE FROM Tickets WHERE ticket_ID=?", (ticket_ID))
     print("Ticket deleted")
 
+    #Update ticket_count
+    c.execute("SELECT ticket_count FROM Projects WHERE project_ID=?", projID)
+    count = c.fetchone()[0]
+    
+    c.execute("UPDATE Projects SET ticket_count=? WHERE project_ID=?", (count-1, projID))
+
     ####REFRESH TABLE####
 
     #query the database
@@ -174,7 +179,7 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
 
     for info in records:
         #print(info)
-        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[6]))
+        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[5]))
 
     #Commit changes
     conn.commit()
@@ -193,8 +198,6 @@ def submitTicket(proj_ID):
     #create cursor
     c = conn.cursor()
 
-    ticketStatus = "In Progress"
-
     curr_date = datetime.now()
     curr_date.isoformat()
     #Only keep YYYY-MM-DD
@@ -202,9 +205,15 @@ def submitTicket(proj_ID):
     print(clicked1, clicked2)
 
     #insert into table
-    ticket_data = (enterTicketName.get(), enterTicketDescription.get(), clicked1.get(), clicked2.get(), ticketStatus, curr_date, proj_ID)
-    c.execute("""INSERT INTO Tickets(title, description, ticket_type, priority, status, date_created, project_ID) VALUES
-                (?, ?, ?, ?, ?, ?, ?)""", ticket_data)
+    ticket_data = (enterTicketName.get(), enterTicketDescription.get(), clicked1.get(), clicked2.get(), curr_date, proj_ID)
+    c.execute("""INSERT INTO Tickets(title, description, ticket_type, priority, date_created, project_ID) VALUES
+                (?, ?, ?, ?, ?, ?)""", ticket_data)
+
+    #update ticket count
+    c.execute("SELECT ticket_count FROM Projects WHERE project_ID=?", proj_ID)
+    count = c.fetchone()[0]
+
+    c.execute("UPDATE Projects SET ticket_count=? WHERE project_ID=?", (count+1, proj_ID))
 
     #commit changes to conn
     conn.commit()
@@ -238,7 +247,7 @@ def submitTicket(proj_ID):
 
     for info in records:
         #print(info)
-        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[6]))
+        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[5]))
 
     #commit changes to conn
     conn.commit()
@@ -373,14 +382,14 @@ def View_Project(proj_ID):
     else:
         Display_Tickets(project_window, proj_ID)
 
-        #Create field to manage a certain ticket
-        select_label = Label(project_window, text="Ticket ID Number:")
-        select_label.grid(row=4, column=0, pady=5, sticky=E)
-        ticket_select_box = Entry(project_window, width=30)
-        ticket_select_box.grid(row=4, column=1, pady=5, padx=10, sticky=W)
+    #Create field to manage a certain ticket
+    select_label = Label(project_window, text="Ticket ID Number:")
+    select_label.grid(row=4, column=0, pady=5, sticky=E)
+    ticket_select_box = Entry(project_window, width=30)
+    ticket_select_box.grid(row=4, column=1, pady=5, padx=10, sticky=W)
 
-        manage_tick_btn = Button(project_window, text="Manage Ticket", command=lambda: tickMan(ticket_select_box.get()))
-        manage_tick_btn.grid(row=5, column=0, columnspan=2)
+    manage_tick_btn = Button(project_window, text="Manage Ticket", command=lambda: tickMan(ticket_select_box.get()))
+    manage_tick_btn.grid(row=5, column=0, columnspan=2)
 
     #Place "Create New Ticket" button
     create_ticket_btn = Button(project_window, text="Create New Ticket", command=tickNew)
@@ -422,7 +431,7 @@ def Display_Tickets(project_window, proj_ID):
 
     for info in records:
         #print(info)
-        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[6]))
+        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[5]))
 
     #close conn
     conn.close()

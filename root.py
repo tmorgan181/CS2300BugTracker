@@ -34,7 +34,6 @@ try:
 		description Text,
 		ticket_type Text,
 		priority Text,
-		status Text,
 		date_created Text,
 		project_ID Integer,
 		FOREIGN KEY (project_ID) REFERENCES Projects(project_ID)
@@ -385,17 +384,16 @@ else:
 		#print(info)
 		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))
 
-	#Create field to view/manage a certain project
-	select_label = Label(root, text="Project ID Number:")
-	select_label.grid(row=3, column=0, pady=5, sticky=E)
-	proj_select_box = Entry(root, width=30)
-	proj_select_box.grid(row=3, column=1, padx=5, pady=5, sticky=W)
+#Create field to view/manage a certain project
+select_label = Label(root, text="Project ID Number:")
+select_label.grid(row=3, column=0, pady=5, sticky=E)
+proj_select_box = Entry(root, width=30)
+proj_select_box.grid(row=3, column=1, padx=5, pady=5, sticky=W)
 
-	view_proj_btn = Button(root, text="View Project", command=lambda: projectPage.View_Project(proj_select_box.get()))
-	view_proj_btn.grid(row=4, column=0, columnspan=2)
-	manage_proj_btn = Button(root, text="Manage Project", command=lambda: Manage_Project(proj_select_box.get()))
-	manage_proj_btn.grid(row=5, column=0, columnspan=2)
-
+view_proj_btn = Button(root, text="View Project", command=lambda: projectPage.View_Project(proj_select_box.get()))
+view_proj_btn.grid(row=4, column=0, columnspan=2)
+manage_proj_btn = Button(root, text="Manage Project", command=lambda: Manage_Project(proj_select_box.get()))
+manage_proj_btn.grid(row=5, column=0, columnspan=2)
 
 #Place "Create New Project" button
 create_proj_btn = Button(root, text="Create New Project", command=Create_Project)
