@@ -87,6 +87,12 @@ def Save_Changes(ticket_ID, ticket_manage_window):
     print("Changes saved")
 
     ####REFRESH TABLE####
+
+    #query the database
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", proj_ID)
+    records = c.fetchall()
+    print(records)
+    
     table = Treeview(project_window)
     table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
     table['show'] = 'headings'
@@ -102,7 +108,7 @@ def Save_Changes(ticket_ID, ticket_manage_window):
     table.column('priority', anchor='center', width=50)
     table.heading('date_created', text='Created On')
     table.column('date_created', anchor='center', width=100)
-    table.grid(row=6, columnspan=3, sticky = (N,S,W,E))
+    table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
 
     for info in records:
         #print(info)
@@ -137,6 +143,12 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
     print("Ticket deleted")
 
     ####REFRESH TABLE####
+
+    #query the database
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", proj_ID)
+    records = c.fetchall()
+    print(records)
+
     table = Treeview(project_window)
     table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
     table['show'] = 'headings'
@@ -152,7 +164,7 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
     table.column('priority', anchor='center', width=50)
     table.heading('date_created', text='Created On')
     table.column('date_created', anchor='center', width=100)
-    table.grid(row=6, columnspan=3, sticky = (N,S,W,E))
+    table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
 
     for info in records:
         #print(info)
@@ -195,6 +207,12 @@ def submitTicket(proj_ID):
     editor.destroy()
 
     ####REFRESH TABLE####
+
+    #query the database
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", proj_ID)
+    records = c.fetchall()
+    print(records)
+
     table = Treeview(project_window)
     table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
     table['show'] = 'headings'
@@ -210,7 +228,7 @@ def submitTicket(proj_ID):
     table.column('priority', anchor='center', width=50)
     table.heading('date_created', text='Created On')
     table.column('date_created', anchor='center', width=100)
-    table.grid(row=6, columnspan=3, sticky = (N,S,W,E))
+    table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
 
     for info in records:
         #print(info)
@@ -359,9 +377,9 @@ def View_Project(proj_ID):
         manage_tick_btn = Button(project_window, text="Manage Ticket", command=lambda: tickMan(ticket_select_box.get()))
         manage_tick_btn.grid(row=5, column=0, columnspan=2)
 
-        #Place "Create New Ticket" button
-        create_ticket_btn = Button(project_window, text="Create New Ticket", command=tickNew)
-        create_ticket_btn.grid(row=6, column=0, columnspan=2)
+    #Place "Create New Ticket" button
+    create_ticket_btn = Button(project_window, text="Create New Ticket", command=tickNew)
+    create_ticket_btn.grid(row=6, column=0, columnspan=2)
 
     #Close connection
     conn.close()
