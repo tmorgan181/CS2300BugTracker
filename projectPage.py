@@ -89,7 +89,7 @@ def Save_Changes(ticket_ID, ticket_manage_window):
     ####REFRESH TABLE####
 
     #query the database
-    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
     records = c.fetchall()
     print(records)
 
@@ -101,7 +101,7 @@ def Save_Changes(ticket_ID, ticket_manage_window):
     table.heading('title', text='Title')
     table.column('title', anchor='center', width=100)
     table.heading('desc', text='Description')
-    table.column('desc', anchor='center', width=250)
+    table.column('desc', anchor='center', width=400)
     table.heading('type', text='Type')
     table.column('type', anchor='center', width=50)
     table.heading('priority', text='Priority')
@@ -145,7 +145,7 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
     ####REFRESH TABLE####
 
     #query the database
-    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
     records = c.fetchall()
     print(records)
 
@@ -157,7 +157,7 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
     table.heading('title', text='Title')
     table.column('title', anchor='center', width=100)
     table.heading('desc', text='Description')
-    table.column('desc', anchor='center', width=250)
+    table.column('desc', anchor='center', width=400)
     table.heading('type', text='Type')
     table.column('type', anchor='center', width=50)
     table.heading('priority', text='Priority')
@@ -209,7 +209,7 @@ def submitTicket(proj_ID):
     ####REFRESH TABLE####
 
     #query the database
-    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
     records = c.fetchall()
     print(records)
 
@@ -221,7 +221,7 @@ def submitTicket(proj_ID):
     table.heading('title', text='Title')
     table.column('title', anchor='center', width=100)
     table.heading('desc', text='Description')
-    table.column('desc', anchor='center', width=250)
+    table.column('desc', anchor='center', width=400)
     table.heading('type', text='Type')
     table.column('type', anchor='center', width=50)
     table.heading('priority', text='Priority')
@@ -351,6 +351,7 @@ def View_Project(proj_ID):
 
     #make labels
     projName = Label(project_window, text=str(projectName))
+    projName.config(font=("", 24, "bold"))
     projName.grid(row=0, column=0, columnspan=2)
     projDescription = Label(project_window, text=str(projectDescription))
     projDescription.grid(row=1, column=0, columnspan=2)
