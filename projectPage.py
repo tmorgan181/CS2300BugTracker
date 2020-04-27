@@ -19,12 +19,15 @@ def tickMan(ticket_ID):
     #Create database cursor
     c = conn.cursor()
 
-    #Ensure project exists
-    c.execute("SELECT Count(*) FROM Tickets WHERE ticket_ID=?", (ticket_ID,))
+    #Ensure ticket exists
+    c.execute("SELECT Count(*) FROM Tickets WHERE ticket_ID=?", ticket_ID)
     count = str(c.fetchone()[0])
     if (count == "0"):
         print("Ticket does not exist")
         return
+
+    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
+    data = c.fetchone()
 
     #Open new window
     ticket_manage_window = Toplevel()
@@ -36,42 +39,45 @@ def tickMan(ticket_ID):
 
     #Place entry box and label for "title" attribute
     title_label = Label(ticket_manage_window, text="Ticket Title*")
-    title_label.grid(row=0, column=0, sticky=W)
+    title_label.grid(row=0, column=0, sticky=W, pady=5, padx=5)
     global title_box
     title_box = Entry(ticket_manage_window, width=30)
-    title_box.grid(row=1, column=0, columnspan=2)
+    title_box.grid(row=1, column=0, columnspan=2, padx=5)
+    title_box.insert(END, data[1])
+
 
     #Place entry box and label for "description" attribute
     description_label = Label(ticket_manage_window, text="Description")
-    description_label.grid(row=2, column=0, sticky=W)
+    description_label.grid(row=2, column=0, sticky=W, pady=5, padx=5)
     global description_box
     description_box = Entry(ticket_manage_window, width=30)
-    description_box.grid(row=3, column=0, columnspan=2)
+    description_box.grid(row=3, column=0, columnspan=2, padx=5)
+    description_box.insert(END, data[2])
     
     #Ticket type and priority labels/menus
     global typeVar
     typeVar = StringVar()
-    typeVar.set("Bug")
+    typeVar.set(str(data[3]))
     newTicketType = Label(ticket_manage_window, text="Type*")
-    newTicketType.grid(row=4, column=0, sticky=W)
-    pickType = OptionMenu(ticket_manage_window, typeVar, "Feature", "Feature", "Bug")
-    pickType.grid(row=5, column=0, sticky=W)
+    newTicketType.grid(row=4, column=0, sticky=W, pady=5, padx=5)
+    pickType = OptionMenu(ticket_manage_window, typeVar, data[3], "Feature", "Bug")
+    pickType.grid(row=5, column=0, sticky=W, padx=5)
 
     global priorityVar
     priorityVar = StringVar()
-    priorityVar.set("Minor")
+    priorityVar.set(str(data[4]))
     newTicketPriority = Label(ticket_manage_window, text="Priority*")
-    newTicketPriority.grid(row=6, column=0, sticky=W)
-    pickPriority = OptionMenu(ticket_manage_window, priorityVar, "Critical", "Critical", "Major", "Minor", "Trivial")
-    pickPriority.grid(row=7, column=0, sticky=W)
+    newTicketPriority.grid(row=6, column=0, sticky=W, pady=5, padx=5)
+    pickPriority = OptionMenu(ticket_manage_window, priorityVar, data[4], "Critical", "Major", "Minor", "Trivial")
+    pickPriority.grid(row=7, column=0, sticky=W, padx=5)
 
     #Place buttons for saving changes, cancelling process, and deleting project
     save_btn = Button(ticket_manage_window, text="Save Changes", command=lambda: Save_Changes(ticket_ID, ticket_manage_window))
-    save_btn.grid(row=8, column=0)
+    save_btn.grid(row=8, column=0, pady=5)
     cancel_btn = Button(ticket_manage_window, text="Cancel", command=lambda: Cancel_Edit(ticket_manage_window))
-    cancel_btn.grid(row=8, column=1)
+    cancel_btn.grid(row=8, column=1, pady=5)
     delete_btn = Button(ticket_manage_window, text="Delete Ticket", command=lambda: Delete_Ticket(ticket_ID, ticket_manage_window))
-    delete_btn.grid(row=9, column=0, columnspan=2)
+    delete_btn.grid(row=9, column=0, columnspan=2, pady=5)
 
     return
 
@@ -89,7 +95,7 @@ def Save_Changes(ticket_ID, ticket_manage_window):
     ####REFRESH TABLE####
 
     #query the database
-    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
     records = c.fetchall()
     print(records)
 
@@ -111,7 +117,7 @@ def Save_Changes(ticket_ID, ticket_manage_window):
     table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
 
     for info in records:
-        #print(info)
+        print(info)
         table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[6]))
 
     #Commit changes
@@ -145,7 +151,7 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
     ####REFRESH TABLE####
 
     #query the database
-    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
     records = c.fetchall()
     print(records)
 
@@ -209,7 +215,7 @@ def submitTicket(proj_ID):
     ####REFRESH TABLE####
 
     #query the database
-    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
     records = c.fetchall()
     print(records)
 
@@ -247,8 +253,8 @@ def tickNew():
     global pickType
     global pickPriority
     editor = Toplevel()
-    editor.title("New Ticket")
-    editor.geometry("400x400")
+    editor.title("Create New Ticket")
+    editor.geometry("300x300")
 
     conn = sqlite3.connect("info.db")
     #Create database cursor
@@ -260,15 +266,15 @@ def tickNew():
 
     #Place entry box and label for "title" attribute
     title_label = Label(editor, text="Ticket Title*")
-    title_label.grid(row=0, column=0, sticky=W)
+    title_label.grid(row=0, column=0, sticky=W, pady=5, padx=5)
     enterTicketName = Entry(editor, width=30)
-    enterTicketName.grid(row=1, column=0, columnspan=2)
+    enterTicketName.grid(row=1, column=0, columnspan=2, padx=5)
 
     #Place entry box and label for "description" attribute
     description_label = Label(editor, text="Description")
-    description_label.grid(row=2, column=0, sticky=W)
+    description_label.grid(row=2, column=0, sticky=W, pady=5, padx=5)
     enterTicketDescription = Entry(editor, width=30)
-    enterTicketDescription.grid(row=3, column=0, columnspan=2)
+    enterTicketDescription.grid(row=3, column=0, columnspan=2, padx=5)
 
     global clicked1
     clicked1 = StringVar()
@@ -278,17 +284,17 @@ def tickNew():
     clicked2.set("Minor")
 
     newTicketType = Label(editor, text="Type*")
-    newTicketType.grid(row=4, column=0, sticky=W)
+    newTicketType.grid(row=4, column=0, sticky=W, pady=5, padx=5)
     pickType = OptionMenu(editor, clicked1, "Feature", "Feature", "Bug")
-    pickType.grid(row=5, column=0, sticky=W)
+    pickType.grid(row=5, column=0, sticky=W, padx=5)
 
     newTicketPriority = Label(editor, text="Priority*")
-    newTicketPriority.grid(row=6, column=0, sticky=W)
+    newTicketPriority.grid(row=6, column=0, sticky=W, pady=5, padx=5)
     pickPriority = OptionMenu(editor, clicked2, "Critical", "Critical", "Major", "Minor", "Trivial")
-    pickPriority.grid(row=7, column=0, sticky=W)
+    pickPriority.grid(row=7, column=0, sticky=W, padx=5)
 
     submitBtn = Button(editor, text="Create ticket", command=lambda: submitTicket(projID))
-    submitBtn.grid(row=8, column=0, pady=(10,0))
+    submitBtn.grid(row=8, column=0, pady=5)
 
     #Commit changes
     conn.commit()

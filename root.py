@@ -92,41 +92,6 @@ def Count_Projects():
 	#Return the count
 	return proj_count
 
-#Generate a button for the project with ID 'proj_ID'
-def Generate_Button(proj_ID):
-	#Connect to DB file
-	conn = sqlite3.connect("info.db")
-	#Create database cursor
-	c = conn.cursor()
-
-	#Select the project tuple with matching ID
-	c.execute("SELECT * FROM Projects WHERE project_ID = ?", (proj_ID,))
-	proj_info = c.fetchone()
-	print(proj_info)
-
-	#Create frame for the project info
-	proj_frame = Frame(root, width=300, height=100)
-	#Disable resizing of frame
-	proj_frame.grid_propagate(False)
-	#Enable button to fill frame
-	proj_frame.columnconfigure(0, weight=1)
-	proj_frame.rowconfigure(0, weight=1)
-	proj_frame.grid(columnspan=2)
-
-	#Create and place button
-	btn_text = str(proj_info[0]) + "\t\t" + str(proj_info[1])
-	proj_btn = Button(proj_frame, text=btn_text, command=lambda: projectPage.View_Project(proj_ID))
-	proj_btn.grid(row=0, column=0)
-
-	#Place description beneath button
-	desc_label = Label(proj_frame, text="-- " + proj_info[2])
-	desc_label.grid(row=1, column=0, sticky=N+W)
-
-	#Close connection
-	conn.close()
-
-	return
-
 ###BUTTON FUNCTIONS###
 #Create a new project and insert it into the database
 def Create_Project():
@@ -139,13 +104,13 @@ def Create_Project():
 	name_label = Label(proj_window, text="Project Name*")
 	name_label.grid(row=1, column=0, sticky=W, padx=5, pady=5)
 	name_box = Entry(proj_window, width=30)
-	name_box.grid(row=2, column=0, padx=5, pady=5)
+	name_box.grid(row=2, column=0, padx=5)
 
 	#Place entry box and label for "description" attribute
 	description_label = Label(proj_window, text="Description")
 	description_label.grid(row=3, column=0, sticky=W, padx=5, pady=5)
 	description_box = Entry(proj_window, width=30)
-	description_box.grid(row=4, column=0, padx=5, pady=5)
+	description_box.grid(row=4, column=0, padx=5)
 
 	#Place submit button
 	submit_btn = Button(proj_window, text="Create Project", command=lambda: Submit_Project(name_box, description_box, proj_window))
@@ -213,11 +178,6 @@ def Submit_Project(name_box, description_box, proj_window):
 
 #Open project manager window to allow deletion and editing of projects
 def Manage_Project(proj_ID):
-	#Open new window
-	proj_manage_window = Toplevel()
-	proj_manage_window.geometry("300x300")
-	proj_manage_window.title("Manage Project")
-
 	#Connect to database info file
 	conn = sqlite3.connect("info.db")
 	#Create database cursor
@@ -230,20 +190,30 @@ def Manage_Project(proj_ID):
 		print("Project does not exist")
 		return
 
+	c.execute("SELECT * FROM Projects WHERE project_ID=?", proj_ID)
+	data = c.fetchone()
+
 	#Close connection
 	conn.close()
+
+	#Open new window
+	proj_manage_window = Toplevel()
+	proj_manage_window.geometry("300x300")
+	proj_manage_window.title("Manage Project")
 
 	#Place entry box and label for "name" attribute
 	name_label = Label(proj_manage_window, text="Project Name*")
 	name_label.grid(row=1, column=0, sticky=W, padx=5, pady=5)
 	name_box = Entry(proj_manage_window, width=30)
-	name_box.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+	name_box.insert(END, data[1])
+	name_box.grid(row=2, column=0, columnspan=2, padx=5)
 
 	#Place entry box and label for "description" attribute
 	description_label = Label(proj_manage_window, text="Description")
 	description_label.grid(row=3, column=0, sticky=W, padx=5, pady=5)
 	description_box = Entry(proj_manage_window, width=30)
-	description_box.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
+	description_box.insert(END, data[2])
+	description_box.grid(row=4, column=0, columnspan=2, padx=5)
 
 	#Place buttons for saving changes, cancelling process, and deleting project
 	save_btn = Button(proj_manage_window, text="Save Changes", command=lambda: Save_Changes(proj_ID, name_box, description_box, proj_manage_window))
@@ -265,8 +235,6 @@ def Save_Changes(proj_ID, name_box, description_box, proj_manage_window):
 	#Update the project record with matching proj_ID
 	c.execute("UPDATE Projects SET name=?, description=? WHERE project_ID=?", (name_box.get(), description_box.get(), proj_ID))
 	print("Changes saved")
-
-
 
 	#Refresh Table
 
@@ -377,7 +345,7 @@ your_proj_label = Label(root, text="Your Projects")
 your_proj_label.configure(font="TkDefaultFont 9 underline")
 your_proj_label.grid(row=1, column=0, pady=5, padx=10, sticky=W)
 
-#Generate and place buttons for each of the user's projects
+#Display projects
 proj_count = Count_Projects()
 if (proj_count == 0):
 	#Display "No Projects Found" instead of buttons
