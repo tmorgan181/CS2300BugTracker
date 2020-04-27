@@ -155,6 +155,8 @@ def submitTicket(proj_ID):
     #close conn
     conn.close()
 
+    ####REFRESH TABLE####
+
 #make a new ticket
 def tickNew():
     global editor
@@ -251,6 +253,7 @@ def View_Project(proj_ID):
         print("project does not exist")
         return
     #Open project window
+    global project_window
     project_window = Toplevel()
     project_window.geometry("750x450")
     project_window.title("View Project")
