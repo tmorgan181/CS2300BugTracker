@@ -89,10 +89,10 @@ def Save_Changes(ticket_ID, ticket_manage_window):
     ####REFRESH TABLE####
 
     #query the database
-    c.execute("SELECT * FROM Tickets WHERE project_ID=?", proj_ID)
+    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
     records = c.fetchall()
     print(records)
-    
+
     table = Treeview(project_window)
     table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
     table['show'] = 'headings'
@@ -145,7 +145,7 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
     ####REFRESH TABLE####
 
     #query the database
-    c.execute("SELECT * FROM Tickets WHERE project_ID=?", proj_ID)
+    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
     records = c.fetchall()
     print(records)
 
@@ -209,7 +209,7 @@ def submitTicket(proj_ID):
     ####REFRESH TABLE####
 
     #query the database
-    c.execute("SELECT * FROM Tickets WHERE project_ID=?", proj_ID)
+    c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
     records = c.fetchall()
     print(records)
 
