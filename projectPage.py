@@ -86,6 +86,28 @@ def Save_Changes(ticket_ID, ticket_manage_window):
     c.execute("UPDATE Tickets SET title=?, description=?, ticket_type=?, priority=? WHERE ticket_ID=?", (title_box.get(), description_box.get(), typeVar.get(), priorityVar.get(), ticket_ID))
     print("Changes saved")
 
+    ####REFRESH TABLE####
+    table = Treeview(project_window)
+    table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
+    table['show'] = 'headings'
+    table.heading('ID_num', text='ID #')
+    table.column('ID_num', anchor='center', width=30)
+    table.heading('title', text='Title')
+    table.column('title', anchor='center', width=100)
+    table.heading('desc', text='Description')
+    table.column('desc', anchor='center', width=250)
+    table.heading('type', text='Type')
+    table.column('type', anchor='center', width=50)
+    table.heading('priority', text='Priority')
+    table.column('priority', anchor='center', width=50)
+    table.heading('date_created', text='Created On')
+    table.column('date_created', anchor='center', width=100)
+    table.grid(row=6, columnspan=3, sticky = (N,S,W,E))
+
+    for info in records:
+        #print(info)
+        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[6]))
+
     #Commit changes
     conn.commit()
     #Close connection
@@ -113,6 +135,28 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
     #Update the ticket record with matching ID
     c.execute("DELETE FROM Tickets WHERE ticket_ID=?", (ticket_ID))
     print("Ticket deleted")
+
+    ####REFRESH TABLE####
+    table = Treeview(project_window)
+    table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
+    table['show'] = 'headings'
+    table.heading('ID_num', text='ID #')
+    table.column('ID_num', anchor='center', width=30)
+    table.heading('title', text='Title')
+    table.column('title', anchor='center', width=100)
+    table.heading('desc', text='Description')
+    table.column('desc', anchor='center', width=250)
+    table.heading('type', text='Type')
+    table.column('type', anchor='center', width=50)
+    table.heading('priority', text='Priority')
+    table.column('priority', anchor='center', width=50)
+    table.heading('date_created', text='Created On')
+    table.column('date_created', anchor='center', width=100)
+    table.grid(row=6, columnspan=3, sticky = (N,S,W,E))
+
+    for info in records:
+        #print(info)
+        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[6]))
 
     #Commit changes
     conn.commit()
@@ -150,12 +194,34 @@ def submitTicket(proj_ID):
     #close create ticket window
     editor.destroy()
 
+    ####REFRESH TABLE####
+    table = Treeview(project_window)
+    table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
+    table['show'] = 'headings'
+    table.heading('ID_num', text='ID #')
+    table.column('ID_num', anchor='center', width=30)
+    table.heading('title', text='Title')
+    table.column('title', anchor='center', width=100)
+    table.heading('desc', text='Description')
+    table.column('desc', anchor='center', width=250)
+    table.heading('type', text='Type')
+    table.column('type', anchor='center', width=50)
+    table.heading('priority', text='Priority')
+    table.column('priority', anchor='center', width=50)
+    table.heading('date_created', text='Created On')
+    table.column('date_created', anchor='center', width=100)
+    table.grid(row=6, columnspan=3, sticky = (N,S,W,E))
+
+    for info in records:
+        #print(info)
+        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[6]))
+
     #commit changes to conn
     conn.commit()
     #close conn
     conn.close()
 
-    ####REFRESH TABLE####
+    
 
 #make a new ticket
 def tickNew():
