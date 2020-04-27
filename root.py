@@ -350,6 +350,5 @@ else:
 	#Close connection
 	conn.close()
 
-
 #Enter event loop
 root.mainloop()
