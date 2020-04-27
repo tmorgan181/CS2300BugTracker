@@ -278,7 +278,7 @@ def Delete_Project(proj_ID, proj_manage_window):
 #Create root window
 root = Tk()
 root.title("Bug Tracker")
-root.geometry("500x500")
+root.geometry("750x450")
 
 #Place title frame
 title_frame = Frame(root, height=10, width=500)
@@ -289,7 +289,7 @@ title_label.grid(row=0, column=0, columnspan=2, sticky=N+S+E+W)
 #Place "Your Projects" label
 your_proj_label = Label(root, text="Your Projects")
 your_proj_label.configure(font="TkDefaultFont 9 underline")
-your_proj_label.grid(row=1, column=0, columnspan=2, pady=5, sticky=W)
+your_proj_label.grid(row=1, column=0, pady=5, padx=10, sticky=W)
 
 #Generate and place buttons for each of the user's projects
 proj_count = Count_Projects()
@@ -317,12 +317,12 @@ else:
 	table.heading('name', text='Name')
 	table.column('name', anchor='center', width=100)
 	table.heading('desc', text='Description')
-	table.column('desc', anchor='center', width=250)
+	table.column('desc', anchor='center', width=400)
 	table.heading('tickets', text='Ticket Count')
 	table.column('tickets', anchor='center', width=100)
 	table.heading('date_created', text='Created On')
 	table.column('date_created', anchor='center', width=100)
-	table.grid(row=2, columnspan=2, sticky = (N,S,W,E))
+	table.grid(row=2, columnspan=2, padx=10, sticky = (N,S,W,E))
 
 	for x in ID_list:
 		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
@@ -332,9 +332,9 @@ else:
 
 	#Create field to view/manage a certain project
 	select_label = Label(root, text="Project ID Number:")
-	select_label.grid(row=3, column=0, sticky=E)
+	select_label.grid(row=3, column=0, pady=5, sticky=E)
 	proj_select_box = Entry(root, width=30)
-	proj_select_box.grid(row=3, column=1)
+	proj_select_box.grid(row=3, column=1, padx=5, pady=5, sticky=W)
 
 	view_proj_btn = Button(root, text="View Project", command=lambda: projectPage.View_Project(proj_select_box.get()))
 	view_proj_btn.grid(row=4, column=0, columnspan=2)

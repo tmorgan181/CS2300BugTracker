@@ -252,7 +252,7 @@ def View_Project(proj_ID):
         return
     #Open project window
     project_window = Toplevel()
-    project_window.geometry("600x400")
+    project_window.geometry("750x450")
     project_window.title("View Project")
 
     c.execute("SELECT * FROM Tickets")
@@ -264,17 +264,14 @@ def View_Project(proj_ID):
     projectName = info[1]
     projectDescription = info[2]
 
-
     #make labels
     projName = Label(project_window, text=str(projectName))
-    #projName.config(font=("", 16))
     projName.grid(row=0, column=0, columnspan=2)
     projDescription = Label(project_window, text=str(projectDescription))
-    #projDescription.config(font=("", 12))
     projDescription.grid(row=1, column=0, columnspan=2)
     ticketTitle = Label(project_window, text="Project Tickets")
     ticketTitle.config(font="TkDefaultFont 9 underline")
-    ticketTitle.grid(row=2, column=0, sticky=W)
+    ticketTitle.grid(row=2, column=0, pady=5, padx=10, sticky=W)
 	
     ticket_count = Count_Tickets(proj_ID)
     if (ticket_count == 0):
@@ -286,16 +283,16 @@ def View_Project(proj_ID):
 
         #Create field to manage a certain ticket
         select_label = Label(project_window, text="Ticket ID Number:")
-        select_label.grid(row=4, column=0, sticky=E)
+        select_label.grid(row=4, column=0, pady=5, sticky=E)
         ticket_select_box = Entry(project_window, width=30)
-        ticket_select_box.grid(row=4, column=1)
+        ticket_select_box.grid(row=4, column=1, pady=5, padx=10, sticky=W)
 
         manage_tick_btn = Button(project_window, text="Manage Ticket", command=lambda: tickMan(ticket_select_box.get()))
         manage_tick_btn.grid(row=5, column=0, columnspan=2)
 
         #Place "Create New Ticket" button
-        create_proj_btn = Button(project_window, text="Create New Ticket", command=tickNew)
-        create_proj_btn.grid(row=6, column=0, columnspan=2)
+        create_ticket_btn = Button(project_window, text="Create New Ticket", command=tickNew)
+        create_ticket_btn.grid(row=6, column=0, columnspan=2)
 
     #Close connection
     conn.close()
@@ -303,7 +300,7 @@ def View_Project(proj_ID):
     return
 
 def Display_Tickets(project_window, proj_ID):
-    #conenct to conn
+    #connect to db
     conn = sqlite3.connect('info.db')
     #create cursor
     c = conn.cursor()
@@ -322,14 +319,14 @@ def Display_Tickets(project_window, proj_ID):
     table.heading('title', text='Title')
     table.column('title', anchor='center', width=100)
     table.heading('desc', text='Description')
-    table.column('desc', anchor='center', width=250)
+    table.column('desc', anchor='center', width=400)
     table.heading('type', text='Type')
     table.column('type', anchor='center', width=50)
     table.heading('priority', text='Priority')
     table.column('priority', anchor='center', width=50)
     table.heading('date_created', text='Created On')
     table.column('date_created', anchor='center', width=100)
-    table.grid(row=3, columnspan=3, sticky = (N,S,W,E))
+    table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
 
     for info in records:
         #print(info)
