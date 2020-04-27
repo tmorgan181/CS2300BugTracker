@@ -135,12 +135,6 @@ def Create_Project():
 	proj_window.geometry("300x300")
 	proj_window.title("Create New Project")
 
-	#Place title label
-	title_frame = Frame(proj_window, height=10, width=200)
-	title_frame.grid(row=0, column=0, pady=5)
-	title_label = Label(title_frame, text="CREATE NEW PROJECT")
-	title_label.pack()
-
 	#Place entry box and label for "name" attribute
 	name_label = Label(proj_window, text="Project Name*")
 	name_label.grid(row=1, column=0, sticky=W)
@@ -154,7 +148,7 @@ def Create_Project():
 	description_box.grid(row=4, column=0)
 
 	#Place submit button
-	submit_btn = Button(proj_window, text="CREATE PROJECT", command=lambda: Submit_Project(name_box, description_box, proj_window))
+	submit_btn = Button(proj_window, text="Create Project", command=lambda: Submit_Project(name_box, description_box, proj_window))
 	submit_btn.grid(row=5, column=0)
 
 	return
@@ -177,37 +171,6 @@ def Submit_Project(name_box, description_box, proj_window):
 	c.execute("""INSERT INTO Projects(name, description, ticket_count, date_created) VALUES
 				(?, ?, ?, ?)""", proj_data)
 
-	#Clear text boxes
-	name_box.delete(0, END)
-	description_box.delete(0, END)
-
-	c.execute("SELECT project_ID FROM Projects")
-	ID_list = c.fetchall()
-	print(ID_list)
-
-	#Display projects within a table
-
-	table = Treeview(root)
-	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
-	table['show'] = 'headings'
-	table.heading('ID_num', text='ID #')
-	table.column('ID_num', anchor='center', width=25)
-	table.heading('name', text='Name')
-	table.column('name', anchor='center', width=100)
-	table.heading('desc', text='Description')
-	table.column('desc', anchor='center', width=250)
-	table.heading('tickets', text='Ticket Count')
-	table.column('tickets', anchor='center', width=25)
-	table.heading('date_created', text='Created On')
-	table.column('date_created', anchor='center', width=100)
-	table.grid(row=4, columnspan=2, sticky = (N,S,W,E))
-
-	for x in ID_list:
-		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
-		info = c.fetchone()
-		#print(info)
-		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))
-
 	#Close proj_window
 	proj_window.destroy()
 
@@ -218,31 +181,13 @@ def Submit_Project(name_box, description_box, proj_window):
 
 	return
 
-#Open "Manage Projects" window to allow deletion and editing of projects
-def Manage_Projects():
+#Open project manager window to allow deletion and editing of projects
+def Manage_Project(proj_ID):
 	#Open new window
 	proj_manage_window = Toplevel()
 	proj_manage_window.geometry("300x300")
-	proj_manage_window.title("Manage Projects")
+	proj_manage_window.title("Manage Project")
 
-	#Place title label
-	title_frame = Frame(proj_manage_window, height=10, width=200)
-	title_frame.grid(row=0, column=0, pady=5)
-	title_label = Label(title_frame, text="MANAGE PROJECTS")
-	title_label.pack()
-
-	#Determine which project is to be edited
-	manage_label = Label(proj_manage_window, text="ID of project to edit:")
-	manage_label.grid(row=1, column=0)
-	manage_box = Entry(proj_manage_window, width=10)
-	manage_box.grid(row=1, column=1)
-	manage_btn = Button(proj_manage_window, text="EDIT PROJECT", command=lambda: Edit_Project(manage_box.get(), manage_label, manage_box, manage_btn, proj_manage_window))
-	manage_btn.grid(row=2, column=0)
-
-	return
-
-#Edit the details of a project
-def Edit_Project(proj_ID, manage_label, manage_box, manage_btn, proj_manage_window):
 	#Connect to database info file
 	conn = sqlite3.connect("info.db")
 	#Create database cursor
@@ -258,11 +203,6 @@ def Edit_Project(proj_ID, manage_label, manage_box, manage_btn, proj_manage_wind
 	#Close connection
 	conn.close()
 
-	#Clear label, box, and button from selection
-	manage_label.destroy()
-	manage_box.destroy()
-	manage_btn.destroy()
-
 	#Place entry box and label for "name" attribute
 	name_label = Label(proj_manage_window, text="Project Name*")
 	name_label.grid(row=1, column=0, sticky=W)
@@ -276,12 +216,12 @@ def Edit_Project(proj_ID, manage_label, manage_box, manage_btn, proj_manage_wind
 	description_box.grid(row=4, column=0, columnspan=2)
 
 	#Place buttons for saving changes, cancelling process, and deleting project
-	save_btn = Button(proj_manage_window, text="SAVE CHANGES", command=lambda: Save_Changes(proj_ID, name_box, description_box, proj_manage_window))
+	save_btn = Button(proj_manage_window, text="Save Changes", command=lambda: Save_Changes(proj_ID, name_box, description_box, proj_manage_window))
 	save_btn.grid(row=5, column=0)
-	cancel_btn = Button(proj_manage_window, text="CANCEL", command=lambda: Cancel_Edit(proj_manage_window))
+	cancel_btn = Button(proj_manage_window, text="Cancel", command=lambda: Cancel_Edit(proj_manage_window))
 	cancel_btn.grid(row=5, column=1)
-	delete_btn = Button(proj_manage_window, text="DELETE PROJECT", command=lambda: Delete_Project(proj_ID, proj_manage_window))
-	delete_btn.grid(row=6, column=0)
+	delete_btn = Button(proj_manage_window, text="Delete Project", command=lambda: Delete_Project(proj_ID, proj_manage_window))
+	delete_btn.grid(row=6, column=0, columnspan=2)
 
 	return
 
@@ -295,27 +235,6 @@ def Save_Changes(proj_ID, name_box, description_box, proj_manage_window):
 	#Update the project record with matching proj_ID
 	c.execute("UPDATE Projects SET name=?, description=? WHERE project_ID=?", (name_box.get(), description_box.get(), proj_ID))
 	print("Changes saved")
-
-	table = Treeview(root)
-	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
-	table['show'] = 'headings'
-	table.heading('ID_num', text='ID #')
-	table.column('ID_num', anchor='center', width=25)
-	table.heading('name', text='Name')
-	table.column('name', anchor='center', width=100)
-	table.heading('desc', text='Description')
-	table.column('desc', anchor='center', width=250)
-	table.heading('tickets', text='Ticket Count')
-	table.column('tickets', anchor='center', width=25)
-	table.heading('date_created', text='Created On')
-	table.column('date_created', anchor='center', width=100)
-	table.grid(row=4, columnspan=2, sticky = (N,S,W,E))
-
-	for x in ID_list:
-		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
-		info = c.fetchone()
-		#print(info)
-		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))
 
 	#Commit changes
 	conn.commit()
@@ -345,27 +264,6 @@ def Delete_Project(proj_ID, proj_manage_window):
 	c.execute("DELETE FROM Projects WHERE project_ID=?", (proj_ID))
 	print("Project deleted")
 
-	'''table = Treeview(root)
-	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
-	table['show'] = 'headings'
-	table.heading('ID_num', text='ID #')
-	table.column('ID_num', anchor='center', width=25)
-	table.heading('name', text='Name')
-	table.column('name', anchor='center', width=100)
-	table.heading('desc', text='Description')
-	table.column('desc', anchor='center', width=250)
-	table.heading('tickets', text='Ticket Count')
-	table.column('tickets', anchor='center', width=25)
-	table.heading('date_created', text='Created On')
-	table.column('date_created', anchor='center', width=100)
-	table.grid(row=4, columnspan=2, sticky = (N,S,W,E))
-
-	for x in ID_list:
-		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
-		info = c.fetchone()
-		#print(info)
-		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))'''
-
 	#Commit changes
 	conn.commit()
 	#Close connection
@@ -385,28 +283,20 @@ root.geometry("500x500")
 #Place title frame
 title_frame = Frame(root, height=10, width=500)
 title_frame.grid(row=0, column=0, columnspan=2, pady=5)
-title_label = Label(title_frame, text="WELCOME TO THE BUG TRACKER!")
+title_label = Label(title_frame, text="Welcome to the Bug Tracker!")
 title_label.grid(row=0, column=0, columnspan=2, sticky=N+S+E+W)
-
-#Place "Create New Project" button
-create_proj_btn = Button(root, text="Create New Project", command=Create_Project)
-create_proj_btn.grid(row=1, column=0, padx=10)
-
-#Place "Manage Projects" button
-manage_proj_btn = Button(root, text="Manage Projects", command=Manage_Projects)
-manage_proj_btn.grid(row=1, column=1, padx=10, ipadx=3)
 
 #Place "Your Projects" label
 your_proj_label = Label(root, text="Your Projects")
-your_proj_label.configure(font="TkDefaultFont 10 underline")
-your_proj_label.grid(row=2, column=0, columnspan=2, pady=5, sticky=N+S+E+W)
+your_proj_label.configure(font="TkDefaultFont 9 underline")
+your_proj_label.grid(row=1, column=0, columnspan=2, pady=5, sticky=W)
 
 #Generate and place buttons for each of the user's projects
 proj_count = Count_Projects()
 if (proj_count == 0):
 	#Display "No Projects Found" instead of buttons
 	no_proj_label = Label(root, text="No Projects Found")
-	no_proj_label.grid(row=3, column=0, columnspan=2)
+	no_proj_label.grid(row=2, column=0, columnspan=2)
 else:
 	#Connect to database info file
 	conn = sqlite3.connect("info.db")
@@ -423,16 +313,16 @@ else:
 	table['columns'] = ('ID_num', 'name', 'desc', 'tickets', 'date_created')
 	table['show'] = 'headings'
 	table.heading('ID_num', text='ID #')
-	table.column('ID_num', anchor='center', width=25)
+	table.column('ID_num', anchor='center', width=30)
 	table.heading('name', text='Name')
 	table.column('name', anchor='center', width=100)
 	table.heading('desc', text='Description')
 	table.column('desc', anchor='center', width=250)
 	table.heading('tickets', text='Ticket Count')
-	table.column('tickets', anchor='center', width=25)
+	table.column('tickets', anchor='center', width=100)
 	table.heading('date_created', text='Created On')
 	table.column('date_created', anchor='center', width=100)
-	table.grid(row=4, columnspan=2, sticky = (N,S,W,E))
+	table.grid(row=2, columnspan=2, sticky = (N,S,W,E))
 
 	for x in ID_list:
 		c.execute("SELECT * FROM Projects WHERE project_ID=?", x)
@@ -440,11 +330,21 @@ else:
 		#print(info)
 		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4]))
 
-	#Create field to view a certain project
+	#Create field to view/manage a certain project
+	select_label = Label(root, text="Project ID Number:")
+	select_label.grid(row=3, column=0, sticky=E)
 	proj_select_box = Entry(root, width=30)
-	proj_select_box.grid(row=5, column=0)
-	proj_select_btn = Button(root, text="VIEW PROJECT", command=lambda: projectPage.View_Project(proj_select_box.get()))
-	proj_select_btn.grid(row=5, column=1)
+	proj_select_box.grid(row=3, column=1)
+
+	view_proj_btn = Button(root, text="View Project", command=lambda: projectPage.View_Project(proj_select_box.get()))
+	view_proj_btn.grid(row=4, column=0, columnspan=2)
+	manage_proj_btn = Button(root, text="Manage Project", command=lambda: Manage_Project(proj_select_box.get()))
+	manage_proj_btn.grid(row=5, column=0, columnspan=2)
+
+
+	#Place "Create New Project" button
+	create_proj_btn = Button(root, text="Create New Project", command=Create_Project)
+	create_proj_btn.grid(row=6, column=0, columnspan=2)
 
 
 	#Close connection
