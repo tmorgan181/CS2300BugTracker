@@ -15,93 +15,114 @@ from datetime import datetime
 ###FUNCTIONS###
 def tickMan():
 	#Open new window
-    ticket_manage_window = Toplevel()
-    ticket_manage_window.geometry("300x300")
-    ticket_manage_window.title("Manage Ticket")
+	ticket_manage_window = Toplevel()
+	ticket_manage_window.geometry("300x300")
+	ticket_manage_window.title("Manage Ticket")
 
-    #Connect to database info file
-    conn = sqlite3.connect("info.db")
-    #Create database cursor
-    c = conn.cursor()
+	#Connect to database info file
+	conn = sqlite3.connect("info.db")
+	#Create database cursor
+	c = conn.cursor()
 
-    #Ensure project exists
-    c.execute("SELECT Count(*) FROM Tickets WHERE ticket_ID=?", (ticket_ID,))
-    count = str(c.fetchone()[0])
-    if (count == "0"):
-        print("Ticket does not exist")
-        return
+	#Ensure project exists
+	c.execute("SELECT Count(*) FROM Tickets WHERE ticket_ID=?", (ticket_ID,))
+	count = str(c.fetchone()[0])
+	if (count == "0"):
+		print("Ticket does not exist")
+		return
 
-    #Close connection
-    conn.close()
+	#Close connection
+	conn.close()
 
-    #Place entry box and label for "title" attribute
-    title_label = Label(ticket_manage_window, text="Ticket Title*")
-    title_label.grid(row=0, column=0, sticky=W)
-    global title_box
-    title_box = Entry(ticket_manage_window, width=30)
-    title_box.grid(row=1, column=0, columnspan=2)
+	#Place entry box and label for "title" attribute
+	title_label = Label(ticket_manage_window, text="Ticket Title*")
+	title_label.grid(row=0, column=0, sticky=W)
+	global title_box
+	title_box = Entry(ticket_manage_window, width=30)
+	title_box.grid(row=1, column=0, columnspan=2)
 
-    #Place entry box and label for "description" attribute
-    description_label = Label(ticket_manage_window, text="Description")
-    description_label.grid(row=2, column=0, sticky=W)
-    global description_box
-    description_box = Entry(ticket_manage_window, width=30)
-    description_box.grid(row=3, column=0, columnspan=2)
-    
-    #Ticket type and priority labels/menus
-    global typeVar
-    typeVar = StringVar()
-    typeVar.set("Bug")
-    newTicketType = Label(ticket_manage_window, text="Type*")
-    newTicketType.grid(row=4, column=0, sticky=W)
-    pickType = OptionMenu(ticket_manage_window, typeVar, "Feature", "Feature", "Bug")
-    pickType.grid(row=5, column=0, sticky=W)
+	#Place entry box and label for "description" attribute
+	description_label = Label(ticket_manage_window, text="Description")
+	description_label.grid(row=2, column=0, sticky=W)
+	global description_box
+	description_box = Entry(ticket_manage_window, width=30)
+	description_box.grid(row=3, column=0, columnspan=2)
+	
+	#Ticket type and priority labels/menus
+	global typeVar
+	typeVar = StringVar()
+	typeVar.set("Bug")
+	newTicketType = Label(ticket_manage_window, text="Type*")
+	newTicketType.grid(row=4, column=0, sticky=W)
+	pickType = OptionMenu(ticket_manage_window, typeVar, "Feature", "Feature", "Bug")
+	pickType.grid(row=5, column=0, sticky=W)
 
-    global priorityVar
-    priorityVar = StringVar()
-    priorityVar.set("Minor")
-    newTicketPriority = Label(ticket_manage_window, text="Priority*")
-    newTicketPriority.grid(row=6, column=0, sticky=W)
-    pickPriority = OptionMenu(ticket_manage_window, priorityVar, "Critical", "Critical", "Major", "Minor", "Trivial")
-    pickPriority.grid(row=7, column=0, sticky=W)
+	global priorityVar
+	priorityVar = StringVar()
+	priorityVar.set("Minor")
+	newTicketPriority = Label(ticket_manage_window, text="Priority*")
+	newTicketPriority.grid(row=6, column=0, sticky=W)
+	pickPriority = OptionMenu(ticket_manage_window, priorityVar, "Critical", "Critical", "Major", "Minor", "Trivial")
+	pickPriority.grid(row=7, column=0, sticky=W)
 
-    #Place buttons for saving changes, cancelling process, and deleting project
-    save_btn = Button(ticket_manage_window, text="Save Changes", command=lambda: Save_Changes(ticket_ID, ticket_manage_window))
-    save_btn.grid(row=8, column=0)
-    cancel_btn = Button(ticket_manage_window, text="Cancel", command=lambda: Cancel_Edit(ticket_manage_window))
-    cancel_btn.grid(row=8, column=1)
-    delete_btn = Button(ticket_manage_window, text="Delete Ticket", command=lambda: Delete_Ticket(ticket_ID, ticket_manage_window))
-    delete_btn.grid(row=9, column=0, columnspan=2)
+	#Place buttons for saving changes, cancelling process, and deleting project
+	save_btn = Button(ticket_manage_window, text="Save Changes", command=lambda: Save_Changes(ticket_ID, ticket_manage_window))
+	save_btn.grid(row=8, column=0)
+	cancel_btn = Button(ticket_manage_window, text="Cancel", command=lambda: Cancel_Edit(ticket_manage_window))
+	cancel_btn.grid(row=8, column=1)
+	delete_btn = Button(ticket_manage_window, text="Delete Ticket", command=lambda: Delete_Ticket(ticket_ID, ticket_manage_window))
+	delete_btn.grid(row=9, column=0, columnspan=2)
 
-    return
+	return
 
 #Save changes from edited ticket
 def Save_Changes(ticket_ID, ticket_manage_window):
-    #Connect to database info file
-    conn = sqlite3.connect("info.db")
-    #Create database cursor
-    c = conn.cursor()
+	#Connect to database info file
+	conn = sqlite3.connect("info.db")
+	#Create database cursor
+	c = conn.cursor()
 
-    #Update the ticket record
-    c.execute("UPDATE Tickets SET title=?, description=?, ticket_type=?, priority=? WHERE ticket_ID=?", (title_box.get(), description_box.get(), typeVar.get(), priorityVar.get(), ticket_ID))
-    print("Changes saved")
+	#Update the ticket record
+	c.execute("UPDATE Tickets SET title=?, description=?, ticket_type=?, priority=? WHERE ticket_ID=?", (title_box.get(), description_box.get(), typeVar.get(), priorityVar.get(), ticket_ID))
+	print("Changes saved")
 
-    #Commit changes
-    conn.commit()
-    #Close connection
-    conn.close()
+	#Commit changes
+	conn.commit()
+	#Close connection
+	conn.close()
 
-    #Close the ticket manager
-    ticket_manage_window.destroy()
+	#Close the ticket manager
+	ticket_manage_window.destroy()
 
-    return
+	return
 
 #Cancel changes and close window
 def Cancel_Edit(ticket_manage_window):
-    #Close the ticket manager
-    ticket_manage_window.destroy()
+	#Close the ticket manager
+	ticket_manage_window.destroy()
 
-    return
+	return
+
+#Delete a ticket from the database
+def Delete_Ticket(ticket_ID, ticket_manage_window):
+	#Connect to database info file
+	conn = sqlite3.connect("info.db")
+	#Create database cursor
+	c = conn.cursor()
+
+	#Update the ticket record with matching ID
+	c.execute("DELETE FROM Tickets WHERE ticket_ID=?", (ticket_ID))
+	print("Ticket deleted")
+
+	#Commit changes
+	conn.commit()
+	#Close connection
+	conn.close()
+
+	#Close the ticket manager
+	ticket_manage_window.destroy()
+
+	return
 
 #entry_text = StringVar()
 #dayValue.trace('w', limitSizeDay)
@@ -150,6 +171,8 @@ def submitTicket(proj_ID):
 		#print(info)
 		table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[6]))
 
+		editor.destroy()
+
 	#commit changes to conn
 	conn.commit()
 
@@ -171,11 +194,8 @@ def tickNew():
 	#Create database cursor
 	c = conn.cursor()
 
-	'''global name_entry
-	name_entry = StringVar()
-	name_entry.trace('w', )'''
-
-	newTicketName = Label(editor, text="Title (required)")
+	#old labels and entries
+	'''newTicketName = Label(editor, text="Title (required)")
 	newTicketName.grid(row=0, column=0)
 	newTicketDescription = Label(editor, text="Description")
 	newTicketDescription.grid(row=2, column=0)
@@ -183,12 +203,22 @@ def tickNew():
 	newTicketType.grid(row=4, column=0)
 	newTicketPriority = Label(editor, text="Priority (required)")
 	newTicketPriority.grid(row=6, column=0)
-
-	
 	enterTicketName = Entry(editor, width=30)
 	enterTicketName.grid(row=1, column=0, padx=15, pady=(0,10))
 	enterTicketDescription = Entry(editor, width=30)
-	enterTicketDescription.grid(row=3, column=0, padx=15, pady=(0,10))
+	enterTicketDescription.grid(row=3, column=0, padx=15, pady=(0,10))'''
+
+	#Place entry box and label for "title" attribute
+	title_label = Label(editor, text="Ticket Title*")
+	title_label.grid(row=0, column=0, sticky=W)
+	enterTicketName = Entry(editor, width=30)
+	enterTicketName.grid(row=1, column=0, columnspan=2)
+
+	#Place entry box and label for "description" attribute
+	description_label = Label(editor, text="Description")
+	description_label.grid(row=2, column=0, sticky=W)
+	enterTicketDescription = Entry(editor, width=30)
+	enterTicketDescription.grid(row=3, column=0, columnspan=2)
 
 	global clicked1
 	clicked1 = StringVar()
@@ -200,7 +230,7 @@ def tickNew():
 	
 	pickType = OptionMenu(editor, clicked1, "Feature", "Feature", "Bug")
 	pickType.grid(row=5, column=0, pady=(0,10))
-	pickPriority = OptionMenu(editor, clicked2, "Major", "Major", "Critical", "Minor", "Trivial")
+	pickPriority = OptionMenu(editor, clicked2, "Critical", "Critical", "Major", "Minor", "Trivial")
 	pickPriority.grid(row=7, column=0, pady=(0,10))
 
 	submitBtn = Button(editor, text="Create ticket", command=lambda: submitTicket(projID))
@@ -256,8 +286,8 @@ def View_Project(proj_ID):
 	project_window.geometry("600x400")
 	project_window.title("View Project")
 
-	c.execute("SELECT * FROM Tickets")
-	records = c.fetchall()
+	#c.execute("SELECT * FROM Tickets")
+	#records = c.fetchall()
 
 	global info
 	c.execute("SELECT * FROM Projects WHERE project_ID=?", projID)
@@ -266,8 +296,8 @@ def View_Project(proj_ID):
 	projectDescription = str(info[2])
 
 
-	#make labels
-	projName = Label(project_window, text=str(projectName))
+	#make (old) labels
+	'''projName = Label(project_window, text=str(projectName))
 	projName.config(font=("", 16))
 	projName.grid(row=0, column=1, columnspan=2, padx=(0,100), pady=(10,0))
 	projDescription = Label(project_window, text=str(projectDescription))
@@ -276,20 +306,45 @@ def View_Project(proj_ID):
 	ticketTitle = Label(project_window, text="Tickets")
 	ticketTitle.config(font=("", 16))
 	ticketTitle.grid(row=3, column=1, pady=(15,0), padx=(25,0))
-
 	#make buttons
 	manageTicket = Button(project_window, text="Manage Ticket", command=tickMan)
 	manageTicket.grid(row=1, column=2)
 	createTicket = Button(project_window, text="Create Ticket", command=tickNew)
-	createTicket.grid(row=5, column=1, pady=(10,0))
+	createTicket.grid(row=5, column=1, pady=(10,0))'''
 	
+	#make labels
+	projName = Label(project_window, text=str(projectName))
+	#projName.config(font=("", 16))
+	projName.grid(row=0, column=0, columnspan=2)
+	projDescription = Label(project_window, text=str(projectDescription))
+	#projDescription.config(font=("", 12))
+	projDescription.grid(row=1, column=0, columnspan=2)
+	ticketTitle = Label(project_window, text="Project Tickets")
+	ticketTitle.config(font="TkDefaultFont 9 underline")
+	ticketTitle.grid(row=2, column=0, sticky=W)
+
+	create_tick_btn = Button(project_window, text="Create New Ticket", command=tickNew)
+	create_tick_btn.grid(row=7, column=0, columnspan=2)
+
 	ticket_count = Count_Tickets(proj_ID)
 	if (ticket_count == 0):
 		#Display "No Tickets Found" instead of table
 		no_ticket_label = Label(project_window, text="No Tickets Found")
-		no_ticket_label.grid(row=6, column=0, columnspan=2)
+		no_ticket_label.grid(row=3, column=0, columnspan=2)
 	else:
 		Display_Tickets(proj_ID)
+
+		#Create field to manage a certain ticket
+		select_label = Label(project_window, text="Ticket ID Number:")
+		select_label.grid(row=4, column=0, sticky=E)
+		ticket_select_box = Entry(project_window, width=30)
+		ticket_select_box.grid(row=4, column=1)
+
+		manage_tick_btn = Button(project_window, text="Manage Ticket", command=lambda: tickMan(ticket_select_box.get()))
+		manage_tick_btn.grid(row=5, column=0, columnspan=2)
+
+		#Place "Create New Ticket" button
+		
 
 	#Commit changes
 	conn.commit()
