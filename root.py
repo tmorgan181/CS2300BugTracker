@@ -338,6 +338,7 @@ root.geometry("750x450")
 title_frame = Frame(root, height=10, width=500)
 title_frame.grid(row=0, column=0, columnspan=2, pady=5)
 title_label = Label(title_frame, text="Welcome to the Bug Tracker!")
+title_label.config(font=("", 24, "bold"))
 title_label.grid(row=0, column=0, columnspan=2, sticky=N+S+E+W)
 
 #Place "Your Projects" label
