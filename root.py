@@ -137,19 +137,19 @@ def Create_Project():
 
 	#Place entry box and label for "name" attribute
 	name_label = Label(proj_window, text="Project Name*")
-	name_label.grid(row=1, column=0, sticky=W)
+	name_label.grid(row=1, column=0, sticky=W, padx=5, pady=5)
 	name_box = Entry(proj_window, width=30)
-	name_box.grid(row=2, column=0)
+	name_box.grid(row=2, column=0, padx=5, pady=5)
 
 	#Place entry box and label for "description" attribute
 	description_label = Label(proj_window, text="Description")
-	description_label.grid(row=3, column=0, sticky=W)
+	description_label.grid(row=3, column=0, sticky=W, padx=5, pady=5)
 	description_box = Entry(proj_window, width=30)
-	description_box.grid(row=4, column=0)
+	description_box.grid(row=4, column=0, padx=5, pady=5)
 
 	#Place submit button
 	submit_btn = Button(proj_window, text="Create Project", command=lambda: Submit_Project(name_box, description_box, proj_window))
-	submit_btn.grid(row=5, column=0)
+	submit_btn.grid(row=5, column=0, pady=5)
 
 	return
 
@@ -205,23 +205,23 @@ def Manage_Project(proj_ID):
 
 	#Place entry box and label for "name" attribute
 	name_label = Label(proj_manage_window, text="Project Name*")
-	name_label.grid(row=1, column=0, sticky=W)
+	name_label.grid(row=1, column=0, sticky=W, padx=5, pady=5)
 	name_box = Entry(proj_manage_window, width=30)
-	name_box.grid(row=2, column=0, columnspan=2)
+	name_box.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
 	#Place entry box and label for "description" attribute
 	description_label = Label(proj_manage_window, text="Description")
-	description_label.grid(row=3, column=0, sticky=W)
+	description_label.grid(row=3, column=0, sticky=W, padx=5, pady=5)
 	description_box = Entry(proj_manage_window, width=30)
-	description_box.grid(row=4, column=0, columnspan=2)
+	description_box.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
 	#Place buttons for saving changes, cancelling process, and deleting project
 	save_btn = Button(proj_manage_window, text="Save Changes", command=lambda: Save_Changes(proj_ID, name_box, description_box, proj_manage_window))
-	save_btn.grid(row=5, column=0)
+	save_btn.grid(row=5, column=0, pady=5)
 	cancel_btn = Button(proj_manage_window, text="Cancel", command=lambda: Cancel_Edit(proj_manage_window))
-	cancel_btn.grid(row=5, column=1)
+	cancel_btn.grid(row=5, column=1, pady=5)
 	delete_btn = Button(proj_manage_window, text="Delete Project", command=lambda: Delete_Project(proj_ID, proj_manage_window))
-	delete_btn.grid(row=6, column=0, columnspan=2)
+	delete_btn.grid(row=6, column=0, columnspan=2, pady=5)
 
 	return
 
@@ -342,13 +342,13 @@ else:
 	manage_proj_btn.grid(row=5, column=0, columnspan=2)
 
 
-	#Place "Create New Project" button
-	create_proj_btn = Button(root, text="Create New Project", command=Create_Project)
-	create_proj_btn.grid(row=6, column=0, columnspan=2)
+#Place "Create New Project" button
+create_proj_btn = Button(root, text="Create New Project", command=Create_Project)
+create_proj_btn.grid(row=6, column=0, columnspan=2)
 
 
-	#Close connection
-	conn.close()
+#Close connection
+conn.close()
 
 #Enter event loop
 root.mainloop()

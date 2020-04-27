@@ -14,11 +14,6 @@ from datetime import datetime
 
 ###FUNCTIONS###
 def tickMan(ticket_ID):
-    #Open new window
-    ticket_manage_window = Toplevel()
-    ticket_manage_window.geometry("300x300")
-    ticket_manage_window.title("Manage Ticket")
-
     #Connect to database info file
     conn = sqlite3.connect("info.db")
     #Create database cursor
@@ -30,6 +25,11 @@ def tickMan(ticket_ID):
     if (count == "0"):
         print("Ticket does not exist")
         return
+
+    #Open new window
+    ticket_manage_window = Toplevel()
+    ticket_manage_window.geometry("300x300")
+    ticket_manage_window.title("Manage Ticket")
 
     #Close connection
     conn.close()
@@ -154,8 +154,6 @@ def submitTicket(proj_ID):
     conn.commit()
     #close conn
     conn.close()
-
-    ####REFRESH TABLE####
 
 #make a new ticket
 def tickNew():
