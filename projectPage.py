@@ -3,28 +3,69 @@ import sqlite3
 
 #Import tkinter GUI modules
 try:
-	from Tkinter import *
-	from ttk import *
+    from Tkinter import *
+    from ttk import *
+    from Tkinter import messagebox
 except ImportError:  # Python 3
-	from tkinter import *
-	from tkinter.ttk import *
+    from tkinter import *
+    from tkinter.ttk import *
+    from tkinter import messagebox
 
 #Import time functions
 from datetime import datetime
 
 ###FUNCTIONS###
-def tickMan(ticket_ID):
+def Display_Tickets():
     #Connect to database info file
     conn = sqlite3.connect("info.db")
     #Create database cursor
     c = conn.cursor()
 
-    #Ensure ticket exists
-    c.execute("SELECT Count(*) FROM Tickets WHERE ticket_ID=? AND project_ID=?", (ticket_ID, projID))
-    count = str(c.fetchone()[0])
-    if (count == "0"):
-        print("Ticket does not exist")
+    #query the database
+    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
+    records = c.fetchall()
+    #print(records)
+
+    global ticket_table
+    ticket_table = Treeview(project_window)
+    ticket_table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
+    ticket_table['show'] = 'headings'
+    ticket_table.heading('ID_num', text='ID #')
+    ticket_table.column('ID_num', anchor='center', width=30)
+    ticket_table.heading('title', text='Title')
+    ticket_table.column('title', anchor='center', width=100)
+    ticket_table.heading('desc', text='Description')
+    ticket_table.column('desc', anchor='center', width=400)
+    ticket_table.heading('type', text='Type')
+    ticket_table.column('type', anchor='center', width=50)
+    ticket_table.heading('priority', text='Priority')
+    ticket_table.column('priority', anchor='center', width=50)
+    ticket_table.heading('date_created', text='Created On')
+    ticket_table.column('date_created', anchor='center', width=100)
+    ticket_table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
+
+    for info in records:
+        #print(info)
+        ticket_table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[5]))
+
+    #Close connection
+    conn.close()
+
+    return
+
+def tickMan(ticket_data):
+    #Check a ticket has been selected
+    if(ticket_data == ''):
+        messagebox.showerror("Error", "No ticket selected.")
+        project_window.after(1, lambda: project_window.focus_force())
         return
+
+    ticket_ID = str(ticket_data[0])
+
+    #Connect to database info file
+    conn = sqlite3.connect("info.db")
+    #Create database cursor
+    c = conn.cursor()
 
     c.execute("SELECT * FROM Tickets WHERE ticket_ID=?", ticket_ID)
     data = c.fetchone()
@@ -89,35 +130,8 @@ def Save_Changes(ticket_ID, ticket_manage_window):
 
     #Update the ticket record
     c.execute("UPDATE Tickets SET title=?, description=?, ticket_type=?, priority=? WHERE ticket_ID=?", (title_box.get(), description_box.get(), typeVar.get(), priorityVar.get(), ticket_ID))
-    print("Changes saved")
-
-    ####REFRESH TABLE####
-
-    #query the database
-    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
-    records = c.fetchall()
-    print(records)
-
-    table = Treeview(project_window)
-    table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
-    table['show'] = 'headings'
-    table.heading('ID_num', text='ID #')
-    table.column('ID_num', anchor='center', width=30)
-    table.heading('title', text='Title')
-    table.column('title', anchor='center', width=100)
-    table.heading('desc', text='Description')
-    table.column('desc', anchor='center', width=400)
-    table.heading('type', text='Type')
-    table.column('type', anchor='center', width=50)
-    table.heading('priority', text='Priority')
-    table.column('priority', anchor='center', width=50)
-    table.heading('date_created', text='Created On')
-    table.column('date_created', anchor='center', width=100)
-    table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
-
-    for info in records:
-        print(info)
-        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[5]))
+    messagebox.showinfo("Info", "Changes saved.")
+    project_window.after(1, lambda: project_window.focus_force())
 
     #Commit changes
     conn.commit()
@@ -126,6 +140,9 @@ def Save_Changes(ticket_ID, ticket_manage_window):
 
     #Close the ticket manager
     ticket_manage_window.destroy()
+
+    #Refresh table
+    Display_Tickets()
 
     return
 
@@ -145,41 +162,14 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
 
     #Update the ticket record with matching ID
     c.execute("DELETE FROM Tickets WHERE ticket_ID=?", (ticket_ID))
-    print("Ticket deleted")
+    messagebox.showinfo("Info", "Ticket deleted.")
+    project_window.after(1, lambda: project_window.focus_force())
 
     #Update ticket_count
     c.execute("SELECT ticket_count FROM Projects WHERE project_ID=?", projID)
     count = c.fetchone()[0]
     
     c.execute("UPDATE Projects SET ticket_count=? WHERE project_ID=?", (count-1, projID))
-
-    ####REFRESH TABLE####
-
-    #query the database
-    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
-    records = c.fetchall()
-    print(records)
-
-    table = Treeview(project_window)
-    table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
-    table['show'] = 'headings'
-    table.heading('ID_num', text='ID #')
-    table.column('ID_num', anchor='center', width=30)
-    table.heading('title', text='Title')
-    table.column('title', anchor='center', width=100)
-    table.heading('desc', text='Description')
-    table.column('desc', anchor='center', width=400)
-    table.heading('type', text='Type')
-    table.column('type', anchor='center', width=50)
-    table.heading('priority', text='Priority')
-    table.column('priority', anchor='center', width=50)
-    table.heading('date_created', text='Created On')
-    table.column('date_created', anchor='center', width=100)
-    table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
-
-    for info in records:
-        #print(info)
-        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[5]))
 
     #Commit changes
     conn.commit()
@@ -188,6 +178,9 @@ def Delete_Ticket(ticket_ID, ticket_manage_window):
 
     #Close the ticket manager
     ticket_manage_window.destroy()
+
+    #Refresh tickets table
+    Display_Tickets()
 
     return
 
@@ -202,7 +195,6 @@ def submitTicket(proj_ID):
     curr_date.isoformat()
     #Only keep YYYY-MM-DD
     curr_date = str(curr_date)[:10]
-    print(clicked1, clicked2)
 
     #insert into table
     ticket_data = (enterTicketName.get(), enterTicketDescription.get(), clicked1.get(), clicked2.get(), curr_date, proj_ID)
@@ -217,42 +209,16 @@ def submitTicket(proj_ID):
 
     #commit changes to conn
     conn.commit()
+    #close conn
+    conn.close()
 
     #close create ticket window
     editor.destroy()
 
-    ####REFRESH TABLE####
+    #Refresh tickets table
+    Display_Tickets()
 
-    #query the database
-    c.execute("SELECT * FROM Tickets WHERE project_ID=?", projID)
-    records = c.fetchall()
-    print(records)
-
-    table = Treeview(project_window)
-    table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
-    table['show'] = 'headings'
-    table.heading('ID_num', text='ID #')
-    table.column('ID_num', anchor='center', width=30)
-    table.heading('title', text='Title')
-    table.column('title', anchor='center', width=100)
-    table.heading('desc', text='Description')
-    table.column('desc', anchor='center', width=400)
-    table.heading('type', text='Type')
-    table.column('type', anchor='center', width=50)
-    table.heading('priority', text='Priority')
-    table.column('priority', anchor='center', width=50)
-    table.heading('date_created', text='Created On')
-    table.column('date_created', anchor='center', width=100)
-    table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
-
-    for info in records:
-        #print(info)
-        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[5]))
-
-    #commit changes to conn
-    conn.commit()
-    #close conn
-    conn.close()
+    return
 
 #make a new ticket
 def tickNew():
@@ -268,10 +234,6 @@ def tickNew():
     conn = sqlite3.connect("info.db")
     #Create database cursor
     c = conn.cursor()
-
-    '''global name_entry
-    name_entry = StringVar()
-    name_entry.trace('w', )'''
 
     #Place entry box and label for "title" attribute
     title_label = Label(editor, text="Ticket Title*")
@@ -328,32 +290,33 @@ def Count_Tickets(proj_ID):
 	#Return the count
 	return ticket_count
 
-def View_Project(proj_ID):
+#Close window
+def Close_Window():
+    project_window.destroy()
+
+    return
+
+def View_Project(proj_data):
+    #Check a project has been selected
+    if(proj_data == ''):
+        messagebox.showerror("Error", "No project selected.")
+        return
+
+    proj_ID = str(proj_data[0])
+
     global projID
     projID = proj_ID
+
+    #Open project window
+    global project_window
+    project_window = Toplevel()
+    project_window.geometry("755x425")
+    project_window.title("View Project")
 
     #conenct to conn
     conn = sqlite3.connect('info.db')
     #create cursor
     c = conn.cursor()
-
-    c.execute("SELECT * FROM Projects")
-    records = c.fetchall()
-    cont = 0
-    for x in records:
-        if int(x[0]) == int(projID):
-            print("project does exist")
-            cont = 1
-            break
-
-    if(cont == 0):
-        print("project does not exist")
-        return
-    #Open project window
-    global project_window
-    project_window = Toplevel()
-    project_window.geometry("750x450")
-    project_window.title("View Project")
 
     c.execute("SELECT * FROM Tickets")
     records = c.fetchall()
@@ -374,66 +337,20 @@ def View_Project(proj_ID):
     ticketTitle.config(font="TkDefaultFont 9 underline")
     ticketTitle.grid(row=2, column=0, pady=5, padx=10, sticky=W)
 	
-    ticket_count = Count_Tickets(proj_ID)
-    if (ticket_count == 0):
-        #Display "No Tickets Found" instead of table
-        no_ticket_label = Label(project_window, text="No Tickets Found")
-        no_ticket_label.grid(row=3, column=0, columnspan=2)
-    else:
-        Display_Tickets(project_window, proj_ID)
+    Display_Tickets()
 
-    #Create field to manage a certain ticket
-    select_label = Label(project_window, text="Ticket ID Number:")
-    select_label.grid(row=4, column=0, pady=5, sticky=E)
-    ticket_select_box = Entry(project_window, width=30)
-    ticket_select_box.grid(row=4, column=1, pady=5, padx=10, sticky=W)
-
-    manage_tick_btn = Button(project_window, text="Manage Ticket", command=lambda: tickMan(ticket_select_box.get()))
-    manage_tick_btn.grid(row=5, column=0, columnspan=2)
+    manage_tick_btn = Button(project_window, text="Manage Ticket", command=lambda: tickMan(ticket_table.item(ticket_table.focus())['values']))
+    manage_tick_btn.grid(row=5, column=0, columnspan=2, pady=5)
 
     #Place "Create New Ticket" button
     create_ticket_btn = Button(project_window, text="Create New Ticket", command=tickNew)
     create_ticket_btn.grid(row=6, column=0, columnspan=2)
 
+    #Place "Back" button
+    back_btn = Button(project_window, text="Back", command=Close_Window)
+    back_btn.grid(row=7, column=1, sticky=E, padx=10, pady=5)
+
     #Close connection
-    conn.close()
-
-    return
-
-def Display_Tickets(project_window, proj_ID):
-    #connect to db
-    conn = sqlite3.connect('info.db')
-    #create cursor
-    c = conn.cursor()
-
-    #query the database
-    c.execute("SELECT * FROM Tickets WHERE project_ID=?", proj_ID)
-    records = c.fetchall()
-    print(records)
-
-    #Configure table
-    table = Treeview(project_window)
-    table['columns'] = ('ID_num', 'title', 'desc', 'type', 'priority', 'date_created')
-    table['show'] = 'headings'
-    table.heading('ID_num', text='ID #')
-    table.column('ID_num', anchor='center', width=30)
-    table.heading('title', text='Title')
-    table.column('title', anchor='center', width=100)
-    table.heading('desc', text='Description')
-    table.column('desc', anchor='center', width=400)
-    table.heading('type', text='Type')
-    table.column('type', anchor='center', width=50)
-    table.heading('priority', text='Priority')
-    table.column('priority', anchor='center', width=50)
-    table.heading('date_created', text='Created On')
-    table.column('date_created', anchor='center', width=100)
-    table.grid(row=3, columnspan=2, padx=10, sticky = (N,S,W,E))
-
-    for info in records:
-        #print(info)
-        table.insert("", "end", values=(info[0], info[1], info[2], info[3], info[4], info[5]))
-
-    #close conn
     conn.close()
 
     return
