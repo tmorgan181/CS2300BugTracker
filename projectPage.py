@@ -312,6 +312,7 @@ def View_Project(proj_data):
     project_window = Toplevel()
     project_window.geometry("755x425")
     project_window.title("View Project")
+    project_window.state("zoomed")
 
     #conenct to conn
     conn = sqlite3.connect('info.db')
