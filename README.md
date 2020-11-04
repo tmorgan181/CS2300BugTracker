@@ -1,8 +1,5 @@
-# Bug Tracker
-Created for our CS 2300 Databases class, the Bug Tracker program stores information about features and bugs within a development project.
-
-# Description
-Our program is written in Python, using built-in Python tools for GUI (TKinter) and database (SQLite3) implementation. Users can create and manage projects, which contain a number of tickets that detail the progress/requirements for bugs and features within the project.
+# Project Description
+Created for our CS 2300 Databases class, the Bug Tracker program allows users to create and manage development projects, and associate a number of tickets with each one. Tickets detail the progress/requirements for bugs and features within the project. Our program is written in Python, using built-in Python tools for GUI (TKinter) and database (SQLite3) implementation.
 
 # Installation/Usage
 To install this program, simply clone this repository and run the Python file `Bug_Tracker.py`. This will initialize a new local database instance, where program data will be stored. As long as Python 2 or above is installed on your machine, the required dependencies will already be present.
