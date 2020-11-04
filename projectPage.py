@@ -264,7 +264,7 @@ def tickNew():
     pickPriority = OptionMenu(editor, clicked2, "Critical", "Critical", "Major", "Minor", "Trivial")
     pickPriority.grid(row=7, column=0, sticky=W, padx=5)
 
-    submitBtn = Button(editor, text="Create ticket", command=lambda: submitTicket(projID))
+    submitBtn = Button(editor, text="Create Ticket", command=lambda: submitTicket(projID))
     submitBtn.grid(row=8, column=0, pady=5)
 
     #Commit changes
